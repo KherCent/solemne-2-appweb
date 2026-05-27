@@ -5,24 +5,37 @@
       <span class="brand-logo">🛠️</span>
       <span class="brand-name">InfraTech S.A.</span>
     </div>
-    <ul class="nav-links">
+    <!-- Mobile Menu Toggle Button -->
+    <button class="menu-toggle" (click)="toggleMenu()" [class.open]="isMenuOpen" aria-label="Menu Principal">
+      <span class="bar"></span>
+      <span class="bar"></span>
+      <span class="bar"></span>
+    </button>
+
+    <ul class="nav-links" [class.open]="isMenuOpen">
       <li>
-        <a routerLink="/dashboard" routerLinkActive="active-link" [routerLinkActiveOptions]="{exact: true}">
+        <a routerLink="/dashboard" routerLinkActive="active-link" [routerLinkActiveOptions]="{exact: true}" (click)="closeMenu()">
           📊 Dashboard
         </a>
       </li>
       <li>
-        <a routerLink="/incidents" routerLinkActive="active-link">
+        <a routerLink="/incidents" routerLinkActive="active-link" (click)="closeMenu()">
           📋 Incidentes
         </a>
       </li>
       <li>
-        <a routerLink="/technicians" routerLinkActive="active-link">
+        <a routerLink="/technicians" routerLinkActive="active-link" (click)="closeMenu()">
           ⚙️ Técnicos
         </a>
       </li>
+      <li class="mobile-only-profile">
+        <div class="user-profile">
+          <span class="avatar">JH</span>
+          <span class="username">Jorge Herrera</span>
+        </div>
+      </li>
     </ul>
-    <div class="user-profile">
+    <div class="user-profile desktop-only-profile">
       <span class="avatar">JH</span>
       <span class="username">Jorge Herrera</span>
     </div>
