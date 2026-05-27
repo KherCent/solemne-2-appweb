@@ -1,0 +1,80 @@
+<div class="form-container">
+  <div class="card form-card">
+    <div class="card-header">
+      <h1>{{ isEditMode ? 'Editar Incidente #' + incidentId : 'Registrar Nuevo Incidente' }}</h1>
+      <p class="subtitle">Complete la información detallada del incidente técnico</p>
+    </div>
+    
+    <form [formGroup]="incidentForm" (ngSubmit)="onSubmit()" class="card-body">
+      <!-- Grid de Tipo y Area -->
+      <div class="form-row">
+        <div class="form-group col">
+          <label for="tipo">Tipo de Incidente <span class="required">*</span></label>
+          <input type="text" id="tipo" formControlName="tipo" placeholder="Ej: Falla de Red, Impresora..." 
+                 class="form-control" [class.is-invalid]="isFieldInvalid('tipo')" />
+          <div class="invalid-feedback" *ngIf="isFieldInvalid('tipo')">
+            El tipo de incidente es requerido (mínimo 2 caracteres).
+          </div>
+        </div>
+
+        <div class="form-group col">
+          <label for="area">Área Afectada <span class="required">*</span></label>
+          <input type="text" id="area" formControlName="area" placeholder="Ej: Contabilidad, TI, Ventas..." 
+                 class="form-control" [class.is-invalid]="isFieldInvalid('area')" />
+          <div class="invalid-feedback" *ngIf="isFieldInvalid('area')">
+            El área afectada es requerida (mínimo 2 caracteres).
+          </div>
+        </div>
+      </div>
+
+      <!-- Prioridad y Estado (o Técnico) -->
+      <div class="form-row">
+        <div class="form-group col">
+          <label for="prioridad">Prioridad <span class="required">*</span></label>
+          <select id="prioridad" formControlName="prioridad" class="form-control" [class.is-invalid]="isFieldInvalid('prioridad')">
+            <option value="" disabled>Seleccione prioridad</option>
+            <option *ngFor="let p of priorities" [value]="p">{{ p }}</option>
+          </select>
+          <div class="invalid-feedback" *ngIf="isFieldInvalid('prioridad')">
+            La prioridad es obligatoria.
+          </div>
+        </div>
+
+        <div class="form-group col" *ngIf="isEditMode">
+          <label for="estado">Estado de Resolución</label>
+          <select id="estado" formControlName="estado" class="form-control">
+            <option *ngFor="let s of statuses" [value]="s">{{ s }}</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Responsable Técnico -->
+      <div class="form-group">
+        <label for="responsableTecnico">Responsable Técnico (Opcional)</label>
+        <select id="responsableTecnico" formControlName="responsableTecnico" class="form-control">
+          <option value="">-- Sin Asignar --</option>
+          <option *ngFor="let tech of technicians" [value]="tech">{{ tech }}</option>
+        </select>
+      </div>
+
+      <!-- Descripción -->
+      <div class="form-group">
+        <label for="descripcion">Descripción del Problema <span class="required">*</span></label>
+        <textarea id="descripcion" formControlName="descripcion" rows="5" 
+                  placeholder="Describa de manera detallada el problema técnico..." 
+                  class="form-control" [class.is-invalid]="isFieldInvalid('descripcion')"></textarea>
+        <div class="invalid-feedback" *ngIf="isFieldInvalid('descripcion')">
+          La descripción es requerida (debe tener entre 10 y 1000 caracteres).
+        </div>
+      </div>
+
+      <!-- Botones de Acción -->
+      <div class="form-actions">
+        <a routerLink="/incidents" class="btn btn-secondary">Cancelar</a>
+        <button type="submit" class="btn btn-primary" [disabled]="incidentForm.invalid && incidentForm.touched">
+          {{ isEditMode ? 'Guardar Cambios' : 'Registrar Incidente' }}
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
