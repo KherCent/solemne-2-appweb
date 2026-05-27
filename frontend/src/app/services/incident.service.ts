@@ -8,7 +8,7 @@ import { Incident, IncidentPriority, IncidentStatus, IncidentStats } from '../mo
 })
 export class TaskService {
   private apiUrl = typeof window !== 'undefined' && window.location.origin.includes('localhost:4200')
-    ? 'http://localhost:8080/api/incidents'
+    ? 'http://localhost:8081/api/incidents'
     : '/api/incidents';
 
 
