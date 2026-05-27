@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Outfit:wght@300;400;500;600;700&display=swap');
 
 * {
   box-sizing: border-box;
@@ -8,51 +8,96 @@
 
 body {
   margin: 0;
-  font-family: 'Outfit', 'Inter', system-ui, -apple-system, sans-serif;
+  font-family: 'Outfit', sans-serif;
+  background-color: #121315;
+  color: #d1d5db;
   -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
 }
 
-/* Global Buttons */
+/* Monospace fonts for metrics/IDs/dates */
+.mono {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.9em;
+}
+
+/* Brutalist Corporate Buttons */
 .btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
-  padding: 0.6rem 1.2rem;
-  font-size: 0.9rem;
-  font-weight: 600;
-  border-radius: 6px;
-  border: none;
+  padding: 0.75rem 1.5rem;
+  font-size: 0.85rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  border-radius: 0px;
+  border: 2px solid #334155;
   cursor: pointer;
   text-decoration: none;
-  transition: all 0.2s ease;
-}
-
-.btn:hover {
-  transform: translateY(-1.5px);
+  transition: all 0.15s ease-in-out;
 }
 
 .btn-primary {
-  background: #38bdf8;
-  color: #0f172a;
+  background: #3b82f6;
+  color: #fff;
+  border-color: #3b82f6;
 }
 
 .btn-primary:hover {
-  background: #0ea5e9;
-  box-shadow: 0 0 15px rgba(56, 189, 248, 0.4);
+  background: #2563eb;
+  border-color: #2563eb;
+  box-shadow: 4px 4px 0px rgba(59, 130, 246, 0.2);
 }
 
 .btn-secondary {
-  background: rgba(255, 255, 255, 0.08);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  color: #fff;
+  background: #1c1e22;
+  color: #94a3b8;
+  border-color: #334155;
 }
 
 .btn-secondary:hover {
-  background: rgba(255, 255, 255, 0.15);
+  color: #fff;
+  background: #272a30;
+  border-color: #475569;
 }
 
+.btn-pdf {
+  background: #ef4444;
+  color: #fff;
+  border-color: #ef4444;
+}
+
+.btn-pdf:hover {
+  background: #dc2626;
+  border-color: #dc2626;
+  box-shadow: 4px 4px 0px rgba(239, 68, 68, 0.25);
+}
+
+/* Structured Layout Cards */
+.card {
+  background: #181a1e;
+  border: 2px solid #2d3139;
+  border-radius: 0px;
+  box-shadow: 6px 6px 0px rgba(0, 0, 0, 0.15);
+}
+
+.card-header {
+  background: #1e222b;
+  border-bottom: 2px solid #2d3139;
+  padding: 1rem 1.5rem;
+}
+
+.card-header h2 {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 1rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: #f1f5f9;
+}
+
+/* Utilities */
 .text-right {
   text-align: right;
 }
@@ -61,7 +106,19 @@ body {
   color: #64748b !important;
 }
 
-/* Font Awesome or generic icons fallback styling */
-i {
-  font-style: normal;
+/* Form Controls */
+.form-control {
+  background: #0f1013;
+  border: 2px solid #2d3139;
+  border-radius: 0px;
+  color: #fff;
+  padding: 0.75rem 1rem;
+  font-family: 'Outfit', sans-serif;
+  font-size: 0.95rem;
+  transition: border-color 0.15s;
+}
+
+.form-control:focus {
+  border-color: #3b82f6;
+  outline: none;
 }

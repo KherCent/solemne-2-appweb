@@ -1,11 +1,9 @@
 :host {
   display: block;
   min-height: 100vh;
-  background-color: #0f172a;
-  background-image: radial-gradient(circle at top right, rgba(56, 189, 248, 0.05), transparent 40%),
-                    radial-gradient(circle at bottom left, rgba(168, 85, 247, 0.05), transparent 40%);
-  color: #f8fafc;
-  font-family: 'Outfit', 'Inter', system-ui, -apple-system, sans-serif;
+  background-color: #121315;
+  color: #cbd5e1;
+  font-family: 'Outfit', sans-serif;
 }
 
 .app-layout {
@@ -19,10 +17,9 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background: rgba(15, 23, 42, 0.85);
-  backdrop-filter: blur(12px);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-  padding: 0.75rem 2rem;
+  background: #181a1e;
+  border-bottom: 2px solid #2d3139;
+  padding: 1rem 2rem;
   position: sticky;
   top: 0;
   z-index: 100;
@@ -35,20 +32,22 @@
 }
 
 .brand-logo {
-  font-size: 1.5rem;
+  font-size: 1.25rem;
 }
 
 .brand-name {
-  font-size: 1.25rem;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 1.15rem;
   font-weight: 700;
   color: #fff;
+  text-transform: uppercase;
   letter-spacing: -0.5px;
 }
 
 .nav-links {
   display: flex;
   list-style: none;
-  gap: 1.5rem;
+  gap: 1rem;
   margin: 0;
   padding: 0;
 }
@@ -56,22 +55,24 @@
 .nav-links a {
   color: #94a3b8;
   text-decoration: none;
-  font-size: 0.95rem;
-  font-weight: 600;
-  padding: 0.5rem 0.75rem;
-  border-radius: 6px;
-  transition: all 0.2s ease;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.85rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  padding: 0.6rem 1rem;
+  border: 2px solid transparent;
+  transition: all 0.15s ease-in-out;
 }
 
 .nav-links a:hover {
   color: #fff;
-  background: rgba(255, 255, 255, 0.05);
+  background: #22252a;
 }
 
 .nav-links a.active-link {
-  color: #38bdf8;
-  background: rgba(56, 189, 248, 0.1);
-  box-shadow: inset 0 -2px 0 #38bdf8;
+  color: #3b82f6;
+  background: #1c1e22;
+  border-color: #3b82f6;
 }
 
 /* Profile area */
@@ -82,23 +83,23 @@
 }
 
 .avatar {
-  background: linear-gradient(135deg, #38bdf8, #818cf8);
+  background: #272a30;
   color: #fff;
+  font-family: 'JetBrains Mono', monospace;
   font-weight: 700;
-  font-size: 0.85rem;
+  font-size: 0.8rem;
   width: 32px;
   height: 32px;
-  border-radius: 50%;
+  border: 2px solid #475569;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 0 10px rgba(56, 189, 248, 0.3);
 }
 
 .username {
-  font-size: 0.9rem;
+  font-size: 0.85rem;
   font-weight: 600;
-  color: #cbd5e1;
+  color: #94a3b8;
 }
 
 /* Main Content */
@@ -115,14 +116,15 @@
 .app-footer {
   text-align: center;
   padding: 1.5rem;
-  background: rgba(15, 23, 42, 0.9);
-  border-top: 1px solid rgba(255, 255, 255, 0.05);
+  background: #181a1e;
+  border-top: 2px solid #2d3139;
   margin-top: auto;
 }
 
 .app-footer p {
   margin: 0;
-  font-size: 0.8rem;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.75rem;
   color: #64748b;
 }
 
