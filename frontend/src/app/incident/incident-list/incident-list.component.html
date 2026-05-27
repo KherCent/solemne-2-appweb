@@ -1,0 +1,158 @@
+<div class="list-container">
+  <!-- Header -->
+  <div class="list-header">
+    <div>
+      <h1>Portal de Gestión de Incidentes</h1>
+      <p class="subtitle">InfraTech S.A. - Panel de Control</p>
+    </div>
+    <div class="header-actions">
+      <a routerLink="/incidents/new" class="btn btn-primary">
+        <i class="fas fa-plus"></i> Registrar Incidente
+      </a>
+    </div>
+  </div>
+
+  <!-- Alerta General si hay incidentes retrasados -->
+  <div class="alert alert-danger" *ngIf="incidents && incidents.length > 0">
+    <div class="alert-icon">⚠️</div>
+    <div class="alert-content">
+      <strong>Atención:</strong> Hay incidentes pendientes sin resolver por más de 48 horas. Revise las alertas en la lista.
+    </div>
+  </div>
+
+  <!-- Filtros -->
+  <div class="card filter-card">
+    <div class="card-header">
+      <h2><i class="fas fa-filter"></i> Filtros de Búsqueda</h2>
+    </div>
+    <div class="card-body filter-grid">
+      <div class="form-group">
+        <label for="tipo">Tipo de Incidente</label>
+        <input type="text" id="tipo" [(ngModel)]="filters.tipo" placeholder="Ej: Red, Hardware..." class="form-control" (ngModelChange)="applyFilters()" />
+      </div>
+
+      <div class="form-group">
+        <label for="estado">Estado</label>
+        <select id="estado" [(ngModel)]="filters.estado" class="form-control" (change)="applyFilters()">
+          <option [ngValue]="undefined">Todos</option>
+          <option *ngFor="let s of statuses" [value]="s">{{ s }}</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="prioridad">Prioridad</label>
+        <select id="prioridad" [(ngModel)]="filters.prioridad" class="form-control" (change)="applyFilters()">
+          <option [ngValue]="undefined">Todas</option>
+          <option *ngFor="let p of priorities" [value]="p">{{ p }}</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="fechaInicio">Fecha Desde</label>
+        <input type="date" id="fechaInicio" [(ngModel)]="filters.fechaInicio" class="form-control" (change)="applyFilters()" />
+      </div>
+
+      <div class="form-group">
+        <label for="fechaFin">Fecha Hasta</label>
+        <input type="date" id="fechaFin" [(ngModel)]="filters.fechaFin" class="form-control" (change)="applyFilters()" />
+      </div>
+    </div>
+    <div class="card-footer text-right">
+      <button class="btn btn-secondary" (click)="clearFilters()">Limpiar Filtros</button>
+    </div>
+  </div>
+
+  <!-- Lista de Incidentes -->
+  <div class="incidents-list">
+    <div class="card table-card">
+      <div class="table-responsive">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Incidente / Área</th>
+              <th>Descripción</th>
+              <th>Prioridad</th>
+              <th>Estado</th>
+              <th>Fecha Registro</th>
+              <th>Responsable Técnico</th>
+              <th>Resolución / Duración</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let item of incidents" [class.row-overdue]="isOverdue(item.fechaCreacion, item.estado)">
+              <!-- ID -->
+              <td>
+                <span class="incident-id">#{{ item.id }}</span>
+                <span class="badge-overdue-alert" *ngIf="isOverdue(item.fechaCreacion, item.estado)" title="¡Retrasado por más de 48 horas!">
+                  ⚠️ +48h
+                </span>
+              </td>
+
+              <!-- Tipo & Área -->
+              <td>
+                <div class="incident-type">{{ item.tipo }}</div>
+                <div class="incident-area">{{ item.area }}</div>
+              </td>
+
+              <!-- Descripción -->
+              <td>
+                <p class="incident-desc" [title]="item.descripcion">{{ item.descripcion }}</p>
+              </td>
+
+              <!-- Prioridad -->
+              <td>
+                <span class="badge" [ngClass]="getPriorityClass(item.prioridad)">
+                  {{ item.prioridad }}
+                </span>
+              </td>
+
+              <!-- Estado -->
+              <td>
+                <select [ngModel]="item.estado" (ngModelChange)="onUpdateStatus(item.id!, $event)" class="status-select" [ngClass]="getStatusClass(item.estado!)">
+                  <option *ngFor="let s of statuses" [value]="s">{{ s }}</option>
+                </select>
+              </td>
+
+              <!-- Fecha -->
+              <td>
+                <div class="incident-date">{{ item.fechaCreacion | date:'dd/MM/yyyy HH:mm' }}</div>
+              </td>
+
+              <!-- Técnico -->
+              <td>
+                <select [ngModel]="item.responsableTecnico || ''" (ngModelChange)="onAssignTechnician(item.id!, $event)" class="tech-select">
+                  <option value="">-- Sin Asignar --</option>
+                  <option *ngFor="let tech of technicians" [value]="tech">{{ tech }}</option>
+                </select>
+              </td>
+
+              <!-- Resolución y tiempo -->
+              <td>
+                <div *ngIf="item.estado === 'RESUELTO'">
+                  <div class="res-date">{{ item.fechaResolucion | date:'dd/MM/yyyy HH:mm' }}</div>
+                  <div class="res-time">⏱️ {{ item.tiempoResolucion }} min</div>
+                </div>
+                <div *ngIf="item.estado !== 'RESUELTO'">
+                  <span class="text-muted">Pendiente</span>
+                </div>
+              </td>
+
+              <!-- Acciones -->
+              <td>
+                <div class="actions-group">
+                  <a [routerLink]="['/incidents/edit', item.id]" class="btn-icon btn-edit" title="Editar">✏️</a>
+                  <button (click)="onDelete(item.id!)" class="btn-icon btn-delete" title="Eliminar">🗑️</button>
+                </div>
+              </td>
+            </tr>
+            <tr *ngIf="incidents.length === 0">
+              <td colspan="9" class="no-data">No se encontraron incidentes que coincidan con los filtros.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
