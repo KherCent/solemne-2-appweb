@@ -12,7 +12,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.time.Duration;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -41,6 +43,30 @@ public class IncidentService {
 
     public List<IncidentDTO> getAllIncidents() {
         return incidentRepository.findAll().stream()
+                .map(this::convertToDTO)
+                .collect(Collectors.toList());
+    }
+
+    public List<IncidentDTO> searchIncidents(String tipo, IncidentStatus estado, IncidentPriority prioridad, LocalDate fechaInicio, LocalDate fechaFin) {
+        Specification<Incident> spec = Specification.where(null);
+
+        if (tipo != null && !tipo.trim().isEmpty()) {
+            spec = spec.and((root, query, cb) -> cb.like(cb.lower(root.get("tipo")), "%" + tipo.toLowerCase() + "%"));
+        }
+        if (estado != null) {
+            spec = spec.and((root, query, cb) -> cb.equal(root.get("estado"), estado));
+        }
+        if (prioridad != null) {
+            spec = spec.and((root, query, cb) -> cb.equal(root.get("prioridad"), prioridad));
+        }
+        if (fechaInicio != null) {
+            spec = spec.and((root, query, cb) -> cb.greaterThanOrEqualTo(root.get("fechaCreacion"), fechaInicio.atStartOfDay()));
+        }
+        if (fechaFin != null) {
+            spec = spec.and((root, query, cb) -> cb.lessThanOrEqualTo(root.get("fechaCreacion"), fechaFin.atTime(LocalTime.MAX)));
+        }
+
+        return incidentRepository.findAll(spec).stream()
                 .map(this::convertToDTO)
                 .collect(Collectors.toList());
     }

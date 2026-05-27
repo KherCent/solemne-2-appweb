@@ -1,9 +1,12 @@
 package com.infratech.incidentportal.controller;
 
 import com.infratech.incidentportal.dto.IncidentDTO;
+import com.infratech.incidentportal.model.IncidentPriority;
 import com.infratech.incidentportal.model.IncidentStatus;
 import com.infratech.incidentportal.service.IncidentService;
 import jakarta.validation.Valid;
+import org.springframework.format.annotation.DateTimeFormat;
+import java.time.LocalDate;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -26,8 +29,14 @@ public class IncidentController {
     }
 
     @GetMapping
-    public ResponseEntity<List<IncidentDTO>> getAllIncidents() {
-        List<IncidentDTO> incidents = incidentService.getAllIncidents();
+    public ResponseEntity<List<IncidentDTO>> getAllIncidents(
+            @RequestParam(required = false) String tipo,
+            @RequestParam(required = false) IncidentStatus estado,
+            @RequestParam(required = false) IncidentPriority prioridad,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fechaInicio,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fechaFin) {
+        
+        List<IncidentDTO> incidents = incidentService.searchIncidents(tipo, estado, prioridad, fechaInicio, fechaFin);
         return ResponseEntity.ok(incidents);
     }
 
