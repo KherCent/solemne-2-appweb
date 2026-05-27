@@ -152,13 +152,23 @@ public class IncidentService {
         for (IncidentStatus status : IncidentStatus.values()) {
             porEstado.put(status.name(), 0L);
         }
-        all.forEach(i -> porEstado.put(i.getEstado().name(), porEstado.get(i.getEstado().name()) + 1));
+        all.forEach(i -> {
+            if (i.getEstado() != null) {
+                String name = i.getEstado().name();
+                porEstado.put(name, porEstado.getOrDefault(name, 0L) + 1);
+            }
+        });
 
         Map<String, Long> porPrioridad = new HashMap<>();
         for (IncidentPriority p : IncidentPriority.values()) {
             porPrioridad.put(p.name(), 0L);
         }
-        all.forEach(i -> porPrioridad.put(i.getPrioridad().name(), porPrioridad.get(i.getPrioridad().name()) + 1));
+        all.forEach(i -> {
+            if (i.getPrioridad() != null) {
+                String name = i.getPrioridad().name();
+                porPrioridad.put(name, porPrioridad.getOrDefault(name, 0L) + 1);
+            }
+        });
 
         // Calcular promedio de tiempo de resolución (de minutos a horas)
         double avgHours = all.stream()
@@ -173,7 +183,7 @@ public class IncidentService {
         // Incidentes sin resolver por más de 48h
         LocalDateTime threshold = LocalDateTime.now().minusHours(48);
         long overdue = all.stream()
-                .filter(i -> i.getEstado() != IncidentStatus.RESUELTO && i.getFechaCreacion().isBefore(threshold))
+                .filter(i -> i.getEstado() != IncidentStatus.RESUELTO && i.getFechaCreacion() != null && i.getFechaCreacion().isBefore(threshold))
                 .count();
 
         return IncidentStatsDTO.builder()

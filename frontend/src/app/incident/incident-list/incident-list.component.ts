@@ -1,9 +1,11 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { RouterLink } from '@angular/router';
+import { RouterLink, ActivatedRoute } from '@angular/router';
 import { TaskService } from '../../services/incident.service';
 import { Incident, IncidentPriority, IncidentStatus } from '../../models/incident.model';
+import { Subject } from 'rxjs';
+import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 
 @Component({
   selector: 'app-incident-list',
@@ -31,10 +33,37 @@ export class IncidentListComponent implements OnInit {
   // Técnicos disponibles para asignación
   technicians = ['Carlos Gómez', 'Ana Martínez', 'Luis Rodríguez', 'Sofía Plaza', 'Juan Muñoz'];
 
-  constructor(private taskService: TaskService) {}
+  // Subject para debounce de búsqueda por tipo
+  private searchSubject = new Subject<string>();
+
+  constructor(private taskService: TaskService, private route: ActivatedRoute) {}
 
   ngOnInit(): void {
-    this.loadIncidents();
+    // Configurar debounce para filtro de tipo
+    this.searchSubject.pipe(
+      debounceTime(300),
+      distinctUntilChanged()
+    ).subscribe(value => {
+      this.filters.tipo = value;
+      this.loadIncidents();
+    });
+
+    // Suscribirse a query params del Dashboard
+    this.route.queryParamMap.subscribe(params => {
+      const estadoParam = params.get('estado');
+      if (estadoParam) {
+        this.filters.estado = estadoParam as IncidentStatus;
+      }
+      const prioridadParam = params.get('prioridad');
+      if (prioridadParam) {
+        this.filters.prioridad = prioridadParam as IncidentPriority;
+      }
+      this.loadIncidents();
+    });
+  }
+
+  onSearchTypeChange(value: string): void {
+    this.searchSubject.next(value);
   }
 
   loadIncidents(): void {
@@ -115,6 +144,10 @@ export class IncidentListComponent implements OnInit {
     const createdDate = new Date(fechaCreacion);
     const limit = new Date().getTime() - 48 * 60 * 60 * 1000; // 48 horas en milisegundos
     return createdDate.getTime() < limit;
+  }
+
+  hasOverdueIncidents(): boolean {
+    return this.incidents.some(i => this.isOverdue(i.fechaCreacion, i.estado));
   }
 
   getPriorityClass(priority: IncidentPriority): string {
