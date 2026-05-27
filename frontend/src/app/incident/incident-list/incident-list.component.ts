@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { RouterLink, ActivatedRoute } from '@angular/router';
 import { TaskService } from '../../services/incident.service';
 import { Incident, IncidentPriority, IncidentStatus } from '../../models/incident.model';
+import { NotificationService } from '../../services/notification.service';
 import { Subject } from 'rxjs';
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 
@@ -30,15 +31,21 @@ export class IncidentListComponent implements OnInit {
     fechaFin: ''
   };
 
-  // Técnicos disponibles para asignación
-  technicians = ['Carlos Gómez', 'Ana Martínez', 'Luis Rodríguez', 'Sofía Plaza', 'Juan Muñoz'];
+  // Técnicos disponibles para asignación (dinámicos)
+  technicians: string[] = [];
 
   // Subject para debounce de búsqueda por tipo
   private searchSubject = new Subject<string>();
 
-  constructor(private taskService: TaskService, private route: ActivatedRoute) {}
+  constructor(
+    private taskService: TaskService,
+    private route: ActivatedRoute,
+    private notificationService: NotificationService
+  ) {}
 
   ngOnInit(): void {
+    this.loadTechnicians();
+
     // Configurar debounce para filtro de tipo
     this.searchSubject.pipe(
       debounceTime(300),
@@ -86,6 +93,17 @@ export class IncidentListComponent implements OnInit {
     });
   }
 
+  loadTechnicians(): void {
+    this.taskService.getTechnicians().subscribe({
+      next: (data) => {
+        this.technicians = data.filter(t => t.disponible).map(t => t.nombre);
+      },
+      error: (err) => {
+        console.error('Error al cargar técnicos:', err);
+      }
+    });
+  }
+
   applyFilters(): void {
     this.loadIncidents();
   }
@@ -105,33 +123,41 @@ export class IncidentListComponent implements OnInit {
     if (!tech) return;
     this.taskService.assignTechnician(id, tech).subscribe({
       next: () => {
+        this.notificationService.showSuccess(`Técnico ${tech} asignado con éxito`);
         this.loadIncidents();
       },
       error: (err) => {
-        console.error('Error al asignar técnico:', err);
+        this.notificationService.showError('Error al asignar técnico');
       }
     });
   }
 
   onUpdateStatus(id: number, status: IncidentStatus): void {
-    this.taskService.updateStatus(id, status).subscribe({
-      next: () => {
-        this.loadIncidents();
-      },
-      error: (err) => {
-        console.error('Error al actualizar estado:', err);
-      }
-    });
+    if (confirm(`¿Está seguro de que desea cambiar el estado a ${status}?`)) {
+      this.taskService.updateStatus(id, status).subscribe({
+        next: () => {
+          this.notificationService.showSuccess(`Estado actualizado a ${status}`);
+          this.loadIncidents();
+        },
+        error: (err) => {
+          this.notificationService.showError('Error al actualizar el estado del incidente');
+        }
+      });
+    } else {
+      // Refrescar para revertir la selección del select en el UI
+      this.loadIncidents();
+    }
   }
 
   onDelete(id: number): void {
     if (confirm('¿Está seguro de que desea eliminar este incidente?')) {
       this.taskService.deleteIncident(id).subscribe({
         next: () => {
+          this.notificationService.showSuccess('Incidente eliminado');
           this.loadIncidents();
         },
         error: (err) => {
-          console.error('Error al eliminar incidente:', err);
+          this.notificationService.showError('Error al eliminar el incidente');
         }
       });
     }
@@ -148,6 +174,14 @@ export class IncidentListComponent implements OnInit {
 
   hasOverdueIncidents(): boolean {
     return this.incidents.some(i => this.isOverdue(i.fechaCreacion, i.estado));
+  }
+
+  formatResolutionTime(minutes?: number): string {
+    if (minutes === undefined || minutes === null) return '';
+    if (minutes < 60) return `${minutes}m`;
+    const hrs = Math.floor(minutes / 60);
+    const mins = minutes % 60;
+    return mins > 0 ? `${hrs}h ${mins}m` : `${hrs}h`;
   }
 
   getPriorityClass(priority: IncidentPriority): string {

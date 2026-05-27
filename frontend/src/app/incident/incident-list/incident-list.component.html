@@ -132,7 +132,7 @@
               <td>
                 <div *ngIf="item.estado === 'RESUELTO'">
                   <div class="res-date">{{ item.fechaResolucion | date:'dd/MM/yyyy HH:mm' }}</div>
-                  <div class="res-time">⏱️ {{ item.tiempoResolucion }} min</div>
+                  <div class="res-time">⏱️ {{ formatResolutionTime(item.tiempoResolucion) }}</div>
                 </div>
                 <div *ngIf="item.estado !== 'RESUELTO'">
                   <span class="text-muted">Pendiente</span>

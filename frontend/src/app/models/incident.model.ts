@@ -30,3 +30,10 @@ export interface IncidentStats {
   tiempoPromedioResolucionHoras: number;
   sinResolverMas48Horas: number;
 }
+
+export interface Technician {
+  id?: number;
+  nombre: string;
+  especialidad?: string;
+  disponible?: boolean;
+}

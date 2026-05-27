@@ -4,6 +4,7 @@ import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angula
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { TaskService } from '../../services/incident.service';
 import { Incident, IncidentPriority, IncidentStatus } from '../../models/incident.model';
+import { NotificationService } from '../../services/notification.service';
 
 @Component({
   selector: 'app-incident-form',
@@ -19,17 +20,19 @@ export class IncidentFormComponent implements OnInit {
 
   priorities = Object.values(IncidentPriority);
   statuses = Object.values(IncidentStatus);
-  technicians = ['Carlos Gómez', 'Ana Martínez', 'Luis Rodríguez', 'Sofía Plaza', 'Juan Muñoz'];
+  technicians: string[] = [];
 
   constructor(
     private fb: FormBuilder,
     private taskService: TaskService,
     private route: ActivatedRoute,
-    private router: Router
+    private router: Router,
+    private notificationService: NotificationService
   ) {}
 
   ngOnInit(): void {
     this.initForm();
+    this.loadTechnicians();
 
     const idParam = this.route.snapshot.paramMap.get('id');
     if (idParam) {
@@ -37,6 +40,15 @@ export class IncidentFormComponent implements OnInit {
       this.incidentId = +idParam;
       this.loadIncident(this.incidentId);
     }
+  }
+
+  private loadTechnicians(): void {
+    this.taskService.getTechnicians().subscribe({
+      next: (data) => {
+        this.technicians = data.filter(t => t.disponible).map(t => t.nombre);
+      },
+      error: (err) => console.error('Error al cargar técnicos:', err)
+    });
   }
 
   private initForm(): void {
@@ -70,7 +82,7 @@ export class IncidentFormComponent implements OnInit {
       },
       error: (err) => {
         console.error('Error al cargar incidente:', err);
-        alert('No se pudo cargar el incidente.');
+        this.notificationService.showError('No se pudo cargar el incidente.');
         this.router.navigate(['/incidents']);
       }
     });
@@ -96,21 +108,23 @@ export class IncidentFormComponent implements OnInit {
     if (this.isEditMode && this.incidentId) {
       this.taskService.updateIncident(this.incidentId, incidentData).subscribe({
         next: () => {
+          this.notificationService.showSuccess('Incidente actualizado con éxito');
           this.router.navigate(['/incidents']);
         },
         error: (err) => {
           console.error('Error al actualizar incidente:', err);
-          alert('Error al guardar los cambios.');
+          this.notificationService.showError('Error al guardar los cambios.');
         }
       });
     } else {
       this.taskService.createIncident(incidentData).subscribe({
         next: () => {
+          this.notificationService.showSuccess('Incidente registrado con éxito');
           this.router.navigate(['/incidents']);
         },
         error: (err) => {
           console.error('Error al crear incidente:', err);
-          alert('Error al registrar el incidente.');
+          this.notificationService.showError('Error al registrar el incidente.');
         }
       });
     }

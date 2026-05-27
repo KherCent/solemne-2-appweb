@@ -1,0 +1,97 @@
+<div class="tech-container">
+  <!-- Header -->
+  <div class="tech-header">
+    <div>
+      <h1>Administración de Personal Técnico</h1>
+      <p class="subtitle">InfraTech S.A. - Control de Responsables de Soporte</p>
+    </div>
+    <div class="header-actions">
+      <a routerLink="/incidents" class="btn btn-secondary">
+        Ver Incidentes
+      </a>
+    </div>
+  </div>
+
+  <div class="tech-grid-layout">
+    <!-- Formulario (Agregar / Editar) -->
+    <div class="card form-card">
+      <div class="card-header">
+        <h2>{{ isEditMode ? 'Editar Perfil Técnico' : 'Registrar Nuevo Técnico' }}</h2>
+      </div>
+      <form [formGroup]="techForm" (ngSubmit)="onSubmit()" class="card-body">
+        <div class="form-group">
+          <label for="nombre">Nombre Completo <span class="required">*</span></label>
+          <input type="text" id="nombre" formControlName="nombre" placeholder="Ej: Carlos Gómez"
+                 class="form-control" [class.is-invalid]="isFieldInvalid('nombre')" />
+          <div class="invalid-feedback" *ngIf="isFieldInvalid('nombre')">
+            El nombre es obligatorio (mínimo 3 caracteres).
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="especialidad">Especialidad <span class="required">*</span></label>
+          <input type="text" id="especialidad" formControlName="especialidad" placeholder="Ej: Redes, Hardware..."
+                 class="form-control" [class.is-invalid]="isFieldInvalid('especialidad')" />
+          <div class="invalid-feedback" *ngIf="isFieldInvalid('especialidad')">
+            La especialidad es obligatoria.
+          </div>
+        </div>
+
+        <div class="form-group-checkbox">
+          <input type="checkbox" id="disponible" formControlName="disponible" />
+          <label for="disponible">Técnico Disponible para Asignación</label>
+        </div>
+
+        <div class="form-actions">
+          <button type="button" class="btn btn-secondary" (click)="onCancel()" *ngIf="isEditMode">
+            Cancelar
+          </button>
+          <button type="submit" class="btn btn-primary" [disabled]="techForm.invalid">
+            {{ isEditMode ? 'Guardar Cambios' : 'Registrar Técnico' }}
+          </button>
+        </div>
+      </form>
+    </div>
+
+    <!-- Listado de Técnicos -->
+    <div class="card table-card">
+      <div class="card-header">
+        <h2>Lista de Técnicos Activos</h2>
+      </div>
+      <div class="table-responsive">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Nombre</th>
+              <th>Especialidad</th>
+              <th>Estado</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let tech of technicians">
+              <td class="mono">#{{ tech.id }}</td>
+              <td><strong>{{ tech.nombre }}</strong></td>
+              <td>{{ tech.especialidad }}</td>
+              <td>
+                <span class="badge" [ngClass]="tech.disponible ? 'badge-info' : 'badge-danger'">
+                  {{ tech.disponible ? 'Disponible' : 'No Disponible' }}
+                </span>
+              </td>
+              <td>
+                <div class="actions-group">
+                  <button (click)="onEdit(tech)" class="btn-icon btn-edit" title="Editar">✏️</button>
+                  <button (click)="onDelete(tech.id!)" class="btn-icon btn-delete" title="Eliminar">🗑️</button>
+                </div>
+              </td>
+            </tr>
+            <tr *ngIf="technicians.length === 0">
+              <td colspan="5" class="no-data">No hay técnicos registrados.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>

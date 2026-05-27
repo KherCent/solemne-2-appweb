@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { Incident, IncidentPriority, IncidentStatus, IncidentStats } from '../models/incident.model';
+import { Incident, IncidentPriority, IncidentStatus, IncidentStats, Technician } from '../models/incident.model';
 
 @Injectable({
   providedIn: 'root'
@@ -10,6 +10,10 @@ export class TaskService {
   private apiUrl = typeof window !== 'undefined' && window.location.origin.includes('localhost:4200')
     ? 'http://localhost:8090/api/incidents'
     : '/api/incidents';
+
+  private techApiUrl = typeof window !== 'undefined' && window.location.origin.includes('localhost:4200')
+    ? 'http://localhost:8090/api/technicians'
+    : '/api/technicians';
 
 
   constructor(private http: HttpClient) {}
@@ -62,5 +66,22 @@ export class TaskService {
 
   getStats(): Observable<IncidentStats> {
     return this.http.get<IncidentStats>(`${this.apiUrl}/stats`);
+  }
+
+  // Métodos de Técnicos
+  getTechnicians(): Observable<Technician[]> {
+    return this.http.get<Technician[]>(this.techApiUrl);
+  }
+
+  createTechnician(tech: Technician): Observable<Technician> {
+    return this.http.post<Technician>(this.techApiUrl, tech);
+  }
+
+  updateTechnician(id: number, tech: Technician): Observable<Technician> {
+    return this.http.put<Technician>(`${this.techApiUrl}/${id}`, tech);
+  }
+
+  deleteTechnician(id: number): Observable<void> {
+    return this.http.delete<void>(`${this.techApiUrl}/${id}`);
   }
 }
