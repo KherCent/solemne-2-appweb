@@ -52,7 +52,8 @@ export class DashboardComponent implements OnInit, AfterViewInit {
   }
 
   generatePDF(): void {
-    if (!this.stats) return;
+    const stats = this.stats;
+    if (!stats) return;
     this.taskService.getIncidents().subscribe({
       next: (incidents) => {
         const doc = new jsPDF();
@@ -80,14 +81,14 @@ export class DashboardComponent implements OnInit, AfterViewInit {
         doc.text("Resumen de Métricas", 15, 60);
         
         doc.setFontSize(10);
-        doc.text(`Total Incidentes Registrados: ${this.stats.totalIncidentes}`, 15, 70);
-        doc.text(`Tiempo Promedio de Resolución: ${this.stats.tiempoPromedioResolucionHoras} horas`, 15, 76);
-        doc.text(`Incidentes Sin Resolver > 48 horas: ${this.stats.sinResolverMas48Horas}`, 15, 82);
+        doc.text(`Total Incidentes Registrados: ${stats.totalIncidentes}`, 15, 70);
+        doc.text(`Tiempo Promedio de Resolución: ${stats.tiempoPromedioResolucionHoras} horas`, 15, 76);
+        doc.text(`Incidentes Sin Resolver > 48 horas: ${stats.sinResolverMas48Horas}`, 15, 82);
         
         // Estados
-        doc.text(`NUEVOS: ${this.stats.porEstado['NUEVO'] || 0}`, 120, 70);
-        doc.text(`EN PROCESO: ${this.stats.porEstado['EN_PROCESO'] || 0}`, 120, 76);
-        doc.text(`RESUELTOS: ${this.stats.porEstado['RESUELTO'] || 0}`, 120, 82);
+        doc.text(`NUEVOS: ${stats.porEstado['NUEVO'] || 0}`, 120, 70);
+        doc.text(`EN PROCESO: ${stats.porEstado['EN_PROCESO'] || 0}`, 120, 76);
+        doc.text(`RESUELTOS: ${stats.porEstado['RESUELTO'] || 0}`, 120, 82);
         
         // Tabla de Incidentes
         doc.setFontSize(14);
