@@ -11,11 +11,14 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import com.infratech.incidentportal.dto.IncidentStatsDTO;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -139,6 +142,47 @@ public class IncidentService {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Incidente no encontrado con ID: " + id);
         }
         incidentRepository.deleteById(id);
+    }
+
+    public IncidentStatsDTO getIncidentStats() {
+        List<Incident> all = incidentRepository.findAll();
+        long total = all.size();
+
+        Map<String, Long> porEstado = new HashMap<>();
+        for (IncidentStatus status : IncidentStatus.values()) {
+            porEstado.put(status.name(), 0L);
+        }
+        all.forEach(i -> porEstado.put(i.getEstado().name(), porEstado.get(i.getEstado().name()) + 1));
+
+        Map<String, Long> porPrioridad = new HashMap<>();
+        for (IncidentPriority p : IncidentPriority.values()) {
+            porPrioridad.put(p.name(), 0L);
+        }
+        all.forEach(i -> porPrioridad.put(i.getPrioridad().name(), porPrioridad.get(i.getPrioridad().name()) + 1));
+
+        // Calcular promedio de tiempo de resolución (de minutos a horas)
+        double avgHours = all.stream()
+                .filter(i -> i.getEstado() == IncidentStatus.RESUELTO && i.getTiempoResolucion() != null)
+                .mapToLong(Incident::getTiempoResolucion)
+                .average()
+                .orElse(0.0) / 60.0;
+
+        // Formatear a dos decimales
+        avgHours = Math.round(avgHours * 100.0) / 100.0;
+
+        // Incidentes sin resolver por más de 48h
+        LocalDateTime threshold = LocalDateTime.now().minusHours(48);
+        long overdue = all.stream()
+                .filter(i -> i.getEstado() != IncidentStatus.RESUELTO && i.getFechaCreacion().isBefore(threshold))
+                .count();
+
+        return IncidentStatsDTO.builder()
+                .totalIncidentes(total)
+                .porEstado(porEstado)
+                .porPrioridad(porPrioridad)
+                .tiempoPromedioResolucionHoras(avgHours)
+                .sinResolverMas48Horas(overdue)
+                .build();
     }
 
     // Convertir de DTO a Entidad

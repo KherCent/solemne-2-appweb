@@ -1,6 +1,7 @@
 package com.infratech.incidentportal.controller;
 
 import com.infratech.incidentportal.dto.IncidentDTO;
+import com.infratech.incidentportal.dto.IncidentStatsDTO;
 import com.infratech.incidentportal.model.IncidentPriority;
 import com.infratech.incidentportal.model.IncidentStatus;
 import com.infratech.incidentportal.service.IncidentService;
@@ -68,5 +69,11 @@ public class IncidentController {
     public ResponseEntity<Void> deleteIncident(@PathVariable Long id) {
         incidentService.deleteIncident(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/stats")
+    public ResponseEntity<IncidentStatsDTO> getIncidentStats() {
+        IncidentStatsDTO stats = incidentService.getIncidentStats();
+        return ResponseEntity.ok(stats);
     }
 }
